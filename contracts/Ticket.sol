@@ -1,15 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >0.8.7;
 
-contract Ticket {
-    bytes32 private id;
-    string public eventName;
-    uint256 public eventDate;
-    string public eventDescription;
-    uint256 public price;
-    address public owner;
-
-    enum TicketStatus {
+   enum TicketStatus {
         valid,
         used,
         expired
@@ -26,27 +18,35 @@ contract Ticket {
         cinema
     }
 
+contract Ticket {
+    bytes32 private id;
+    string public eventName;
+    uint256 public eventDate;
+    string public eventDescription;
+    uint256 public price;
+    address public owner;
 
-  EventType public eventType;
+ 
+    EventType public eventType;
     TransferStatus public transferStatus;
     TicketStatus public status;
 
     constructor(
-        bytes32 newId,
         string memory newEventName,
         uint256 newEventDate,
         string memory newEventDescription,
         uint256 newPrice,
         address newOwner
-     
+       
+      
     ) {
-        id = newId;
+       
         eventName = newEventName;
         eventDate = newEventDate;
         eventDescription = newEventDescription;
         price = newPrice;
         owner = newOwner;
-       
+         
     }
 
     function changePrice(uint256 _newPrice) public {
@@ -63,7 +63,7 @@ contract Ticket {
 
     function changeOwner(address _newOwner) public {
         owner = _newOwner;
-         require(_newOwner != address(0));
+        require(_newOwner != address(0));
     }
 
     function generateId(

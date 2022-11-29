@@ -4,72 +4,63 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Ticket.sol";
 
 contract Manager is Ownable {
-    
     Ticket[] public ticketList;
     address managerAddress;
+
+   mapping(address => Ticket[]) listTicket;
 
     receive() external payable {}
 
     fallback() external payable {}
 
     function createTicket(
-        bytes32 _id,
         string memory _eventName,
         uint256 _eventDate,
         string memory _eventDescription,
-        uint256 _price,
-        address _ownerAddress,
-       EventType _eventType,
-       TransferStatus _transferStatus,
-        TicketStatus _status
+        uint256 _price
+       
+    ) public payable Ownable{
+        
+        address  owner = msg.sender;
+        bytes32 id = generateId();
+        EventType _eventType = EventType.SPORT;
+        TicketStatus _status = TicketStatus.VALID;
+        TransferStatus _transferStatus = TransferStatus.TRANSFERIBLE;
 
-    ) public {
         Ticket ticket = new Ticket(
-            _id,
+             id,
             _eventName,
             _eventDate,
             _eventDescription,
             _price,
-            _ownerAddress,
-            _eventType,
+            owner,
+            _price,
+            _status,
             _transferStatus,
-            _status
+            _eventType
         );
-        ticketList.push(ticket);
+        return ticketList.push(ticket);
     }
 
-    function showAllTickets(uint256 _totalTicket)
-        public
-        view
-        returns (
-            bytes32 newId,
-            string memory newEventName,
-            uint256 newEventDate,
-            string memory newEventDescription,
-            uint256 newPrice,
-            address newOwner,
-            EventType eventType,
-            TicketStatus status
-        )
-    {
-        return Ticket(ticketList[_totalTicket].showInformation());
+    function showAllTickets() public view returns (uint256)  {
+        
+        uint256 totalTickets = 0;
+        for(uint256 i; i < ticketList.length; i++) {
+            totalTickets += ticketList[i].id;
+        }
+        return totalTickets;
+        
+        
     }
 
-    function showTicketsbyAddress(address _ticketByAdrress)
-        public
-        view
-        returns (
-            bytes32 newId,
-            string memory newEventName,
-            uint256 newEventDate,
-            string memory newEventDescription,
-            uint256 newPrice,
-            address newOwner,
-            EventType eventType,
-            TicketStatus status
-        )
-    {
-        return Ticket(ticketList[_ticketByAdrress].showInformation());
+    function showTicketsbyAddress() public view returns (uint256) {
+         
+        uint256 totalTicketsbyAddress = 0;
+        for(uint256 i; i < ticketList.length; i++) {
+            totalTicketsbyAddress += ticketList[i].owner;
+        }
+        return totalTicketsbyAddress;
+        
     }
 
     function transferTickets(address _newOwner) public Ownable {
@@ -77,19 +68,26 @@ contract Manager is Ownable {
         require(_newOwner != address(0));
     }
 
-    function changeTicketPrice(uint256 _price, address receiver, uint amount) public payable Ownable {  
-        uint256 comision = _price * 0.5;    //  cobrar comision
+    function changeTicketPrice(
+        uint256 _price,
+        address receiver,
+        uint256 amount
+    ) public payable Ownable  {
+        uint256 comision = _price * 0.5; //  cobrar comision
         uint256 PrecioFnal = _price + comision;
-        managerAddress[ receiver] +=  comision[amount];
-        
-        PrecioFnal;
+        managerAddress[receiver] += comision[amount];
     }
 
-    function showStatistics(uint256 _totalTicket, uint256 _totalMoney, uint _totalComision  ) public view returns (uint256) {
-        uint256 _totalTicket = showAllTickets().length;
-        uint256 _totalMoney = Ticket[price] * Ticket;
-        uint256 _totalComision =  (_totalMoney * 0.5) * _totalTicket;
-
-
+    function showStatistics(
+        uint256 _totalTickets,
+        uint256 _totalMoney,
+        uint256 _totalComision,
+        uint256 _price
+    ) public view returns (uint256) {
+        _totalTickets = showAllTickets().length;
+        _totalMoney = Ticket(_price) * _totalTickets;
+        _totalComision = (_totalMoney * 0.5) * _totalTickets;
     }
 }
+
+
