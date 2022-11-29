@@ -7,7 +7,16 @@ contract Manager is Ownable {
     Ticket[] public ticketList;
     address managerAddress;
 
-   mapping(address => Ticket[]) listTicket;
+    mapping(address => Ticket[]) listTicket;
+
+    event TicketCreated(
+        bytes32 id,
+        string eventName,
+        uint256 eventDate,
+        string eventDescription,
+        uint256 pricea,
+        address newOwner
+    );
 
     receive() external payable {}
 
@@ -15,52 +24,35 @@ contract Manager is Ownable {
 
     function createTicket(
         string memory _eventName,
-        uint256 _eventDate,
+        uint256 memory _eventDate,
         string memory _eventDescription,
         uint256 _price
-       
-    ) public payable Ownable{
-        
-        address  owner = msg.sender;
-        bytes32 id = generateId();
-        EventType _eventType = EventType.SPORT;
-        TicketStatus _status = TicketStatus.VALID;
-        TransferStatus _transferStatus = TransferStatus.TRANSFERIBLE;
-
-        Ticket ticket = new Ticket(
-             id,
+    ) public payable {
+        emit TicketCreated(
             _eventName,
             _eventDate,
             _eventDescription,
             _price,
-            owner,
-            _price,
-            _status,
-            _transferStatus,
-            _eventType
+            block.timestamp
         );
-        return ticketList.push(ticket);
+
+        return ticketList.push(Ticket);
     }
 
-    function showAllTickets() public view returns (uint256)  {
-        
+    function showAllTickets() public view returns (uint256) {
         uint256 totalTickets = 0;
-        for(uint256 i; i < ticketList.length; i++) {
+        for (uint256 i; i < ticketList.length; i++) {
             totalTickets += ticketList[i].id;
         }
         return totalTickets;
-        
-        
     }
 
     function showTicketsbyAddress() public view returns (uint256) {
-         
         uint256 totalTicketsbyAddress = 0;
-        for(uint256 i; i < ticketList.length; i++) {
+        for (uint256 i; i < ticketList.length; i++) {
             totalTicketsbyAddress += ticketList[i].owner;
         }
         return totalTicketsbyAddress;
-        
     }
 
     function transferTickets(address _newOwner) public Ownable {
@@ -72,7 +64,8 @@ contract Manager is Ownable {
         uint256 _price,
         address receiver,
         uint256 amount
-    ) public payable Ownable  {
+    ) public payable Ownable {
+        _price = _price;
         uint256 comision = _price * 0.5; //  cobrar comision
         uint256 PrecioFnal = _price + comision;
         managerAddress[receiver] += comision[amount];
@@ -89,5 +82,3 @@ contract Manager is Ownable {
         _totalComision = (_totalMoney * 0.5) * _totalTickets;
     }
 }
-
-
