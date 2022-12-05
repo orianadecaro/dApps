@@ -10,12 +10,10 @@ contract Manager is Ownable {
     mapping(address => Ticket[]) listTicket;
 
     event TicketCreated(
-        bytes32 id,
         string eventName,
         uint256 eventDate,
         string eventDescription,
-        uint256 pricea,
-        address newOwner
+        uint256 price
     );
 
     receive() external payable {}
@@ -24,61 +22,62 @@ contract Manager is Ownable {
 
     function createTicket(
         string memory _eventName,
-        uint256 memory _eventDate,
+        uint256 _eventDate,
         string memory _eventDescription,
         uint256 _price
-    ) public payable {
-        emit TicketCreated(
+    ) public onlyOwner {
+        Ticket ticket = new Ticket(
             _eventName,
             _eventDate,
             _eventDescription,
             _price,
-            block.timestamp
+            msg.sender
         );
 
-        return ticketList.push(Ticket);
+        emit TicketCreated(_eventName, _eventDate, _eventDescription, _price);
+
+        ticketList.push(ticket);
     }
 
-    function showAllTickets() public view returns (uint256) {
+    function showAllTickets() public view {
         uint256 totalTickets = 0;
         for (uint256 i; i < ticketList.length; i++) {
-            totalTickets += ticketList[i].id;
+            totalTickets = totalTickets + 1;
         }
-        return totalTickets;
+        totalTickets;
     }
 
-    function showTicketsbyAddress() public view returns (uint256) {
-        uint256 totalTicketsbyAddress = 0;
+    function showTicketsbyAddress(address ownerAdd) public view {
         for (uint256 i; i < ticketList.length; i++) {
-            totalTicketsbyAddress += ticketList[i].owner;
+            ownerAdd;
         }
-        return totalTicketsbyAddress;
     }
 
-    function transferTickets(address _newOwner) public Ownable {
-        owner = _newOwner;
+    function transferTickets(address _newOwner) public view onlyOwner {
+        _newOwner;
         require(_newOwner != address(0));
     }
 
     function changeTicketPrice(
         uint256 _price,
-        address receiver,
-        uint256 amount
-    ) public payable Ownable {
-        _price = _price;
-        uint256 comision = _price * 0.5; //  cobrar comision
-        uint256 PrecioFnal = _price + comision;
-        managerAddress[receiver] += comision[amount];
+        uint256 comision,
+        uint256 amount,
+        uint256 porcentajeComision
+    ) public payable onlyOwner {
+        _price;
+        porcentajeComision = 5; //porcentaje de comision
+        comision = (_price + porcentajeComision) / 100; // comision por titcket
+
+        // envio comision al manager
+        (bool sent, ) = managerAddress.call{value: amount}("");
+
+        require(sent == true, "Transaction cannot be sent");
     }
 
-    function showStatistics(
-        uint256 _totalTickets,
-        uint256 _totalMoney,
-        uint256 _totalComision,
-        uint256 _price
-    ) public view returns (uint256) {
-        _totalTickets = showAllTickets().length;
-        _totalMoney = Ticket(_price) * _totalTickets;
-        _totalComision = (_totalMoney * 0.5) * _totalTickets;
+    
+
+    function showStatistics() public view {
+        showAllTickets();
+  
     }
 }

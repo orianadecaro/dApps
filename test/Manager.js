@@ -1,4 +1,4 @@
-const manager = artifacts.require("manager");
+const Manager = artifacts.require("Manager");
 
 /*
  * uncomment accounts to access the test accounts made available by the

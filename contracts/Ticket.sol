@@ -19,7 +19,7 @@ pragma solidity >0.8.7;
     }
 
 contract Ticket {
-    bytes32 private id;
+    bytes32 public id;
     string public eventName;
     uint256 public eventDate;
     string public eventDescription;
@@ -40,7 +40,7 @@ contract Ticket {
        
       
     ) {
-       
+        id =  generateId( newEventName, newPrice,newOwner  );
         eventName = newEventName;
         eventDate = newEventDate;
         eventDescription = newEventDescription;
